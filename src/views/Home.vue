@@ -1,5 +1,7 @@
 <template>
+
     <v-content>
+        <Navbar :host = "this.host" :port = "this.port"/>
         <v-container>
             <template v-for = "(item,index) in stories">
                 <v-card class = "ma-3" elevation="5" :key="index">
@@ -25,10 +27,11 @@
 
 <script>
 import axios from "axios";
-
+import Navbar from "@/components/Navbar";
 export default {
   name: 'Home',
   components: {
+      Navbar
   },
     data(){
       return {
@@ -57,9 +60,14 @@ export default {
             console.log(err);
         });
 
-    axios.get(`http://${this.host}:${this.port}/api/users/user`)
+    axios.get(`http://${this.host}:${this.port}/api/users/user`,{
+        headers:{
+            Authorization : JSON.parse(localStorage.getItem("token"))
+        }
+    })
         .then(res=>{
             this.user = res.data;
+            console.log(this.user.fullName);
 
         })
         .catch(err=>{
