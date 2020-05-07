@@ -181,7 +181,7 @@
     import axios from "axios";
     export default {
         name: "Navbar",
-        props:["host","port","user"],
+        props:["host","port","user","storyId"],
         data(){
             return {
                 //rules
@@ -244,11 +244,22 @@
 
             },
             createStorySubmit(){
-
-
+                axios.post(`http://${this.host}:${this.port}/api/stories`,{title:this.createStoryTitle , body:this.createStoryBody},{
+                    headers:{
+                        Authorization : JSON.parse(localStorage.getItem("token"))
+                    }
+                })
+                .then(res=>{
+                    console.log("Successfully created story " + res.data);
+                    this.$router.go();
+                })
+                .catch(err=>{
+                    console.log(err);
+                });
+             this.createStoryTitle = "" , this.createStoryBody = "";
             },
             createStoryReset(){
-
+                this.$refs.form3.reset();
             },
             logOut(){
 
