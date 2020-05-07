@@ -110,12 +110,64 @@
             </div>
 
             <div v-else>
-                <span class = "white--text font-weight-bold">
-                Welcome {{user.userName}}
-                </span>
-                <v-btn  class="success darken-1 my-1 mx-2" @click = "logOut"><span class="font-weight-light white--text">Logout </span> </v-btn>
+ <!--Create A new story dialog box-->
+                <v-dialog v-model="dialog3" width="500">
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                                color = "success darken-1" class="mx-1"
+                                v-on="on"
+                        >
+                            <v-icon color="orange" >create</v-icon>
+                            <span class="font-weight-light white--text">Create</span>
+
+                        </v-btn>
+                    </template>
+
+                    <v-card class="elevation-12" >
+                        <v-app-bar dark class="primary darken-3">
+                            <v-toolbar-title>Create A New Story</v-toolbar-title>
+                        </v-app-bar>
+                        <v-form ref="form3" class="px-3 my-3" v-model="valid3">
+                            <v-text-field
+                                    label="Title"
+                                    placeholder="Enter the title of your story"
+                                    v-model="createStoryTitle"
+                                    prepend-icon="create"
+                                    :rules="[v => !!v || 'FullName is required']"
+                            ></v-text-field>
+
+                            <v-textarea
+
+                                    filled
+                                    label="Body"
+                                    placeholder="Enter the body of your story"
+                                    v-model="createStoryBody"
+                                    :counter="500"
+                                    prepend-icon="create"
+                                    :rules="createStoryRules"
+                            ></v-textarea>
+
+
+                            <div class="col text-center">
+                                <v-btn outlined class="indigo mr-2" @click="createStorySubmit" :disabled="!valid3">SUBMIT</v-btn>
+                                <v-btn color="error darken-2" class="mr-4" @click="createStoryReset">CLEAR</v-btn>
+                            </div>
+                        </v-form>
+                    </v-card>
+
+                </v-dialog>
+
+                <v-btn  class="success darken-1 my-1 mx-2" @click = "logOut">
+                    <span class="font-weight-light white--text">Logout </span>
+
+                    <span class = "white--text font-weight-bold">
+                     ({{user.userName}})
+                    </span>
+                    <v-icon color="error">exit_to_app</v-icon>
+                </v-btn>
 
             </div>
+
 
 
 
@@ -142,11 +194,17 @@
                     // v => (v && v.length <= 10) || "Name must be less than 10 characters"
                     v=> (v == this.registerPassword) ||"Password doesnt match"
                 ],
+                createStoryRules: [
+                    v => !!v || "Name is required",
+                    v => (v && v.length <= 500) || "Body must be less than 500 characters"
+                ],
                 //rules
                 dialog: false ,
                 dialog2:false,
+                dialog3:false,
                 valid: "",
                 valid2:"",
+                valid3:"",
                 loginUserName:"",
                 loginPassword:"",
                 registerUserName:"",
@@ -154,6 +212,8 @@
                 registerFullName:"",
                 registerConfirmPassword:"",
                 loginStatus:false,
+                createStoryTitle:"",
+                createStoryBody:""
 
             }
 
@@ -171,7 +231,7 @@
                 .catch(err=>{
 
                     console.log(err);
-                })
+                });
             },
             loginReset(){
                 this.$refs.form.reset();
@@ -181,6 +241,13 @@
             },
             registerReset(){
                 this.$refs.form2.reset();
+
+            },
+            createStorySubmit(){
+
+
+            },
+            createStoryReset(){
 
             },
             logOut(){
