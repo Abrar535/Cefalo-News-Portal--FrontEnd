@@ -110,7 +110,9 @@
             </div>
 
             <div v-else>
-
+                <span class = "white--text font-weight-bold">
+                Welcome {{user.userName}}
+                </span>
                 <v-btn  class="success darken-1 my-1 mx-2" @click = "logOut"><span class="font-weight-light white--text">Logout </span> </v-btn>
 
             </div>
@@ -127,7 +129,7 @@
     import axios from "axios";
     export default {
         name: "Navbar",
-        props:["host","port"],
+        props:["host","port","user"],
         data(){
             return {
                 //rules
@@ -152,7 +154,7 @@
                 registerFullName:"",
                 registerConfirmPassword:"",
                 loginStatus:false,
-                user:JSON.parse(localStorage.getItem("token")),
+
             }
 
         },

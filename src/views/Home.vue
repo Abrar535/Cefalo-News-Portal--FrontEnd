@@ -1,7 +1,7 @@
 <template>
 
     <v-content>
-        <Navbar :host = "this.host" :port = "this.port"/>
+        <Navbar :host = "this.host" :port = "this.port" :user = "this.user" />
         <v-container>
             <template v-for = "(item,index) in stories">
                 <v-card class = "ma-3" elevation="5" :key="index">
@@ -12,7 +12,7 @@
 
                     </v-card-subtitle>
                     <v-card-text>{{item.body}}</v-card-text>
-                    <div v-if = "user == item.user">
+                    <div v-if = "user != null && user.userName == item.user.userName">
                     <v-btn @click = "test(item.storyId)" class = "mx-3 mb-1" >Edit</v-btn>
                     <v-btn class = "mx-2 mb-1">Delete</v-btn>
                     </div>
@@ -40,7 +40,7 @@ export default {
           totalNumberOfPages:0,
           storiesPerPage:4,
           blah:0,
-          user:{}
+          user:null
       }
     },
     props:["host","port"],
@@ -72,7 +72,7 @@ export default {
         })
         .catch(err=>{
             console.log(err,'Custom Error');
-
+            localStorage.removeItem("token");
         })
 
 
