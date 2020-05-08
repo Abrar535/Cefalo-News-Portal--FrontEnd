@@ -295,10 +295,19 @@
                     }
                 })
                 .then(res=>{
+                    this.dialog3 = false ;
                     console.log("Successfully created story " + res.data);
                     this.$emit('create-story',res.data);
-                    //this.$router.go();
-                    this.dialog3 = false ;
+                    this.$swal({
+                        icon: "success",
+                        title: "Done!",
+                        text: "Story Created",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(() => {
+                        this.$router.go();
+                    }, 1501);
                 })
                 .catch(err=>{
                     console.log(err);

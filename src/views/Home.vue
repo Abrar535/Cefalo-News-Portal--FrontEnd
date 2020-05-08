@@ -71,6 +71,8 @@
                     :page="page"
                     :total-visible="totalVisible"
 
+                    @input="getPaginatedStory"
+
 
             >
 
@@ -108,15 +110,15 @@ export default {
 // pagination data
           totalNumberOfStories:0,
           totalNumberOfPages:0,
-          storiesPerPage:7,
+          storiesPerPage:1,
           circle: false,
           disabled: false,
           nextIcon: 'navigate_next',
-          nextIcons: ['mdi-chevron-right', 'mdi-arrow-right', 'mdi-menu-right'],
+        //  nextIcons: ['mdi-chevron-right', 'mdi-arrow-right', 'mdi-menu-right'],
           prevIcon: 'navigate_before',
-          prevIcons: ['mdi-chevron-left', 'mdi-arrow-left', 'mdi-menu-left'],
+         // prevIcons: ['mdi-chevron-left', 'mdi-arrow-left', 'mdi-menu-left'],
           page: 1,
-          totalVisible: 10,
+          totalVisible: 9,
 
 //pagination data
           //rules
@@ -129,6 +131,19 @@ export default {
     },
     props:["host","port"],
     methods:{
+      getPaginatedStory(){
+        console.log("Current page is ", this.page);
+          axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=${this.page-1}&pageSize=${this.storiesPerPage}`)
+              .then((res)=>{
+                  this.stories = res.data.stories;
+                  this.totalNumberOfPages = res.data.totalNumberOfPages;
+                  console.log("I am total pages" , this.totalNumberOfPages);
+              })
+              .catch(err=>{
+                  console.log(err);
+              });
+      },
+
       createStory(story){
 
           if(this.stories.length < this.storiesPerPage){
@@ -260,3 +275,11 @@ export default {
 
 }
 </script>
+<!--<style scoped>-->
+<!--    /deep/ .v-pagination__item{-->
+<!--        display: none;-->
+<!--    }-->
+<!--    /deep/ .v-pagination__more{-->
+<!--        display: none;-->
+<!--    }-->
+<!--</style>-->
