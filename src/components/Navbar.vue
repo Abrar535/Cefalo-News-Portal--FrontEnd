@@ -296,7 +296,7 @@
                 })
                 .then(res=>{
                     console.log("Successfully created story " + res.data);
-                    this.$emit('add-story',res.data);
+                    this.$emit('create-story',res.data);
                     //this.$router.go();
                     this.dialog3 = false ;
                 })

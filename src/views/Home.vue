@@ -1,7 +1,7 @@
 <template>
 
     <v-content>
-        <Navbar :host = "this.host" :port = "this.port" :user = "this.user" />
+        <Navbar :host = "this.host" :port = "this.port" :user = "this.user" v-on:create-story = "createStory" />
         <v-container>
 
             <template v-for = "(item,index) in stories">
@@ -129,6 +129,14 @@ export default {
     },
     props:["host","port"],
     methods:{
+      createStory(story){
+
+          if(this.stories.length < this.storiesPerPage){
+              this.stories.push(story);
+          }
+
+      },
+
       editStory(storyId){
          this.storyId = storyId;
 
@@ -190,9 +198,13 @@ export default {
                               showConfirmButton: false,
                               timer: 1500
                           });
-                          this.stories = this.stories.filter(story => {
-                              return story.storyId !== storyId;
-                          })
+                          // this.stories = this.stories.filter(story => {
+                          //     return story.storyId !== storyId;
+                          // })
+                          setTimeout(() => {
+                              this.$router.go();
+                          }, 1501);
+
                           console.log("Successfully Deleted ",res.data);
                       })
                       .catch(err=>{
