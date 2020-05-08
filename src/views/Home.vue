@@ -3,6 +3,7 @@
     <v-content>
         <Navbar :host = "this.host" :port = "this.port" :user = "this.user" />
         <v-container>
+
             <template v-for = "(item,index) in stories">
                 <v-card class = "ma-3" elevation="5" :key="index">
                     <v-card-title>{{item.title}}</v-card-title>
@@ -58,6 +59,30 @@
 
         </v-container>
 
+        <v-container>
+
+            <v-pagination
+                    v-model="page"
+                    :circle="circle"
+                    :disabled="disabled"
+                    :length="totalNumberOfPages"
+                    :next-icon="nextIcon"
+                    :prev-icon="prevIcon"
+                    :page="page"
+                    :total-visible="totalVisible"
+
+
+            >
+
+
+
+            </v-pagination>
+
+
+        </v-container>
+
+
+
     </v-content>
 
 </template>
@@ -73,9 +98,6 @@ export default {
     data(){
       return {
           stories:[],
-          totalNumberOfStories:0,
-          totalNumberOfPages:0,
-          storiesPerPage:7,
           storyId:0,
           user:null,
           dialog:false,
@@ -83,7 +105,20 @@ export default {
           editStoryTitle:"",
           editStoryBody:"",
           editStoryDate:"",
+// pagination data
+          totalNumberOfStories:0,
+          totalNumberOfPages:0,
+          storiesPerPage:7,
+          circle: false,
+          disabled: false,
+          nextIcon: 'navigate_next',
+          nextIcons: ['mdi-chevron-right', 'mdi-arrow-right', 'mdi-menu-right'],
+          prevIcon: 'navigate_before',
+          prevIcons: ['mdi-chevron-left', 'mdi-arrow-left', 'mdi-menu-left'],
+          page: 1,
+          totalVisible: 10,
 
+//pagination data
           //rules
           editStoryRules: [
               v => !!v || "Name is required",
@@ -181,6 +216,8 @@ export default {
     axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=0&pageSize=${this.storiesPerPage}`)
         .then((res)=>{
             this.stories = res.data.stories;
+            this.totalNumberOfPages = res.data.totalNumberOfPages;
+            console.log("I am total pages" , this.totalNumberOfPages);
         })
         .catch(err=>{
             console.log(err);
