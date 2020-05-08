@@ -226,10 +226,26 @@
                 .then(res=>{
                     console.log(res.data.jwt);
                     localStorage.setItem("token", JSON.stringify("Bearer "+ res.data.jwt));
-                    this.$router.go();
+                    this.$swal({
+                        icon: "success",
+                        title: `Logged in as ${this.loginUserName}`,
+                        showConfirmButton: false,
+                        timer: 1500
+
+                    });
+                    setTimeout(() => {
+                        this.$router.go();
+                    }, 1501);
                 })
                 .catch(err=>{
+                    this.$swal({
+                        icon: "error",
+                        title: "Access Denied!",
+                        text: "Incorrect Username or Password!",
+                        showConfirmButton: false,
+                        timer: 1500
 
+                    });
                     console.log(err);
                 });
             },
@@ -262,9 +278,33 @@
                 this.$refs.form3.reset();
             },
             logOut(){
+                this.$swal({
+                    title: "Are you sure?",
+                    text: "You will be logged out!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, i want to logout."
+                }).then(result=>{
+                    if(result.value){
+                        localStorage.removeItem("token");
+                        this.$swal({
+                            icon: "success",
+                            title: "Done!",
+                            text: "You have successfully logged out.",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        setTimeout(() => {
+                            this.$router.go();
+                        }, 1501);
 
-                localStorage.removeItem("token");
-                this.$router.go();
+                    }
+                });
+
+
+
 
             }
 

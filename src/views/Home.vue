@@ -132,21 +132,48 @@ export default {
         },
         deleteStory(storyId){
           console.log(storyId);
+          this.$swal({
+              title: "Are you sure?",
+              text: "You will completely remove this story.",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, i want to delete this story!"
+          }).then(result=>{
+              if(result.value){
+                  axios.delete(`http://${this.host}:${this.port}/api/stories/${storyId}`,{
+                      headers:{
+                          Authorization:JSON.parse(localStorage.getItem("token"))
+                      }
+                  })
+                      .then(res=>{
+                          this.$swal({
+                              icon: "success",
+                              title: "Done!",
+                              text: "Successfully deleted the story.",
+                              showConfirmButton: false,
+                              timer: 1500
+                          });
+                          this.stories = this.stories.filter(story => {
+                              return story.storyId !== storyId;
+                          })
+                          console.log("Successfully Deleted ",res.data);
+                      })
+                      .catch(err=>{
+                          this.$swal({
+                              icon: "error",
+                              title: "Sorry!",
+                              text: "Story cannot be deleted!",
+                              showConfirmButton: false,
+                              timer: 1500
 
-          axios.delete(`http://${this.host}:${this.port}/api/stories/${storyId}`,{
-              headers:{
-                  Authorization:JSON.parse(localStorage.getItem("token"))
+                          });
+                          console.log(err);
+                      });
               }
-          })
-            .then(res=>{
-                this.stories = this.stories.filter(story => {
-                    return story.storyId !== storyId;
-                })
-                console.log("Successfully Deleted ",res.data);
-            })
-            .catch(err=>{
-               console.log(err);
             });
+
         }
 
     },
