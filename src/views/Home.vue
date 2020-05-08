@@ -12,10 +12,10 @@
 
                     </v-card-subtitle>
                     <v-card-text>{{item.body}}</v-card-text>
-                    <div v-if = "user != null && user.userName == item.user.userName">
+                    <div v-if = "user !== null && user.userName === item.user.userName">
 
-                    <v-btn @click.stop = "dialog=true" @click="editStoryTitle = item.title, editStoryBody = item.body , editStoryDate = item.publishedDate , editStory(item.storyId)"  class = "mx-3 mb-1" >Edit</v-btn>
-                    <v-btn class = "mx-2 mb-1">Delete</v-btn>
+                    <v-btn @click.stop = "dialog=true" @click="editStoryTitle = item.title, editStoryBody = item.body , editStoryDate = item.publishedDate , editStory(item.storyId)"  class = "mx-3 mb-1" ><v-icon>create</v-icon>Edit</v-btn>
+                    <v-btn class = "mx-2 mb-1" @click = "deleteStory(item.storyId)"><v-icon>delete</v-icon>Delete</v-btn>
                     </div>
                 </v-card>
             </template>
@@ -102,7 +102,7 @@ export default {
           console.log(this.storyId);
           var story = {};
           this.stories.forEach(ob=>{
-          if(ob.storyId == this.storyId){
+          if(ob.storyId === this.storyId){
               story = ob;
           }
        });
@@ -130,6 +130,24 @@ export default {
             console.log("hell i am reset");
             this.$refs.form.reset();
         },
+        deleteStory(storyId){
+          console.log(storyId);
+
+          axios.delete(`http://${this.host}:${this.port}/api/stories/${storyId}`,{
+              headers:{
+                  Authorization:JSON.parse(localStorage.getItem("token"))
+              }
+          })
+            .then(res=>{
+                this.stories = this.stories.filter(story => {
+                    return story.storyId !== storyId;
+                })
+                console.log("Successfully Deleted ",res.data);
+            })
+            .catch(err=>{
+               console.log(err);
+            });
+        }
 
     },
     created(){
@@ -154,7 +172,7 @@ export default {
         .catch(err=>{
             console.log(err,'Custom Error');
             localStorage.removeItem("token");
-        })
+        });
 
 
 

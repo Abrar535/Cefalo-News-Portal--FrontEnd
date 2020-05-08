@@ -117,7 +117,7 @@
                                 color = "success darken-1" class="mx-1"
                                 v-on="on"
                         >
-                            <v-icon color="orange" >create</v-icon>
+                            <v-icon color="orange" >add</v-icon>
                             <span class="font-weight-light white--text">Create</span>
 
                         </v-btn>
@@ -192,7 +192,7 @@
                 confirmPasswordRules: [
                     v => !!v || "Password must be confirmed",
                     // v => (v && v.length <= 10) || "Name must be less than 10 characters"
-                    v=> (v == this.registerPassword) ||"Password doesnt match"
+                    v=> (v === this.registerPassword) ||"Password doesnt match"
                 ],
                 createStoryRules: [
                     v => !!v || "Name is required",
