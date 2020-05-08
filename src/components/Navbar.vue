@@ -254,6 +254,35 @@
             },
             registerSubmit(){
                 this.$refs.form2.validate();
+
+                axios.post(`http://${this.host}:${this.port}/api/public/register/users`,{userName:this.registerUserName , fullName: this.registerFullName , password: this.registerPassword})
+                    .then(res=>{
+                        this.$swal({
+                            icon: "success",
+                            title: "Registerd!",
+                            text: `Successfully registered as ${res.data.userName}.`,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        setTimeout(() => {
+                            this.dialog2 = false ;
+                            this.registerReset();
+                        }, 1501);
+                    })
+                .catch(error=>{
+                    //console.log(error.response.data)
+                    this.$swal({
+                        icon: "error",
+                        title: "Error!",
+                        text: `${error.response.data}`,
+                        showConfirmButton: false,
+                        timer: 2000
+
+                    });
+
+                })
+
+
             },
             registerReset(){
                 this.$refs.form2.reset();
@@ -267,7 +296,9 @@
                 })
                 .then(res=>{
                     console.log("Successfully created story " + res.data);
-                    this.$router.go();
+                    this.$emit('add-story',res.data);
+                    //this.$router.go();
+                    this.dialog3 = false ;
                 })
                 .catch(err=>{
                     console.log(err);
