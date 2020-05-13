@@ -158,17 +158,7 @@ export default {
       },
         editStorySubmit(){
           console.log(this.storyId);
-          var story = {};
-          this.stories.forEach(ob=>{
-          if(ob.storyId === this.storyId){
-              story = ob;
-          }
-       });
 
-        story.title = this.editStoryTitle;
-        story.body = this.editStoryBody;
-
-        this.dialog = false ;
         axios.put(`http://${this.host}:${this.port}/api/stories/${this.storyId}`,{title:this.editStoryTitle , body: this.editStoryBody},{
             headers:{
                 Authorization: JSON.parse(localStorage.getItem("token"))
@@ -176,16 +166,38 @@ export default {
         })
             .then(res=>{
                 console.log(res.data);
+                var story = {};
+                this.stories.forEach(ob=>{
+                    if(ob.storyId === this.storyId){
+                        story = ob;
+                    }
+                });
+
+                story.title = this.editStoryTitle;
+                story.body = this.editStoryBody;
+
+                this.dialog = false ;
                 story.publishedDate = res.data.publishedDate;
+                this.storyId = 0;
             })
             .catch(err=>{
-                console.log(err);
+                //console.log(err.response.data);
+                this.$swal({
+                    icon: "error",
+                    title: "Done!",
+                    text: err.response.data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                setTimeout(() => {
+                    this.$router.go();
+                }, 1501);
             });
-        this.storyId = 0;
+
 
         },
         editStoryReset(){
-            console.log("hell i am reset");
+
             this.$refs.form.reset();
         },
         deleteStory(storyId){
@@ -213,9 +225,7 @@ export default {
                               showConfirmButton: false,
                               timer: 1500
                           });
-                          // this.stories = this.stories.filter(story => {
-                          //     return story.storyId !== storyId;
-                          // })
+
                           setTimeout(() => {
                               this.$router.go();
                           }, 1501);
@@ -231,6 +241,9 @@ export default {
                               timer: 1500
 
                           });
+                          setTimeout(()=>{
+                              this.$router.go();
+                          },1501);
                           console.log(err);
                       });
               }
@@ -265,12 +278,7 @@ export default {
             localStorage.removeItem("token");
         });
 
-
-
     }
-
-
-
 
 
 }

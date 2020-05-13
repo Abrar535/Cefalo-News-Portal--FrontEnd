@@ -310,7 +310,19 @@
                     }, 1501);
                 })
                 .catch(err=>{
-                    console.log(err);
+                    console.log(err.response.data.message);
+                    this.dialog3 = false ;
+                    this.$swal({
+                        icon: "error",
+                        title: "Denied!",
+                        text: err.response.data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(()=>{
+                        this.$router.go();
+                    },1501)
+
                 });
              this.createStoryTitle = "" , this.createStoryBody = "";
             },
