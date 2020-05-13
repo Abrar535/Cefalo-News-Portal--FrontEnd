@@ -1,7 +1,7 @@
 <template>
     <nav>
         <v-app-bar  app class = "primary">
-            <v-btn text height="50" >
+            <v-btn text height="50" @click = "$router.go()" >
             <v-toolbar-title class="text-uppercase white--text">
                 <span class = "font-weight-black mx-3 display-2"> Cefalo News Portal </span>
             </v-toolbar-title>
