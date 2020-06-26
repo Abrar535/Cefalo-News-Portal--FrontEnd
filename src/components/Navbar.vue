@@ -1,12 +1,32 @@
 <template>
     <nav>
         <v-app-bar  app class = "primary">
-            <v-btn text height="50" @click = "$router.go()" >
+            <v-btn text height="50" @click = "homeButtonFunc" >
             <v-toolbar-title class="text-uppercase white--text">
                 <span class = "font-weight-black mx-3 display-2"> Cefalo News Portal </span>
             </v-toolbar-title>
             </v-btn>
             <v-spacer></v-spacer>
+<!-- Tag Searching-->
+            <v-form @submit.prevent="tagSearchSubmit">
+                <div class = "mt-8 pa-3">
+
+                    <v-text-field
+                    placeholder= "Search Story By Tag"
+                    color = "red lighten-2"
+                    background-color = "indigo"
+                    prepend-inner-icon="search"
+                    solo-inverted
+                    clearable
+                    flat
+                    v-model = "tagSearchText"
+                    @click:prepend-inner ="tagSearchSubmit"
+
+                    >
+                    </v-text-field>
+
+                </div>
+            </v-form>
 <!--Login dialog box-->
             <div v-if = "user == null">
             <v-dialog v-model="dialog" width="500">
@@ -19,7 +39,6 @@
 
                     </v-btn>
                 </template>
-
                 <v-card class="elevation-12" >
                     <v-app-bar dark class="primary darken-3">
                         <v-toolbar-title>Login</v-toolbar-title>
@@ -146,7 +165,34 @@
                                     prepend-icon="create"
                                     :rules="createStoryRules"
                             ></v-textarea>
+                            <v-text-field
+                                label = "Tag"
+                                placeholder = "Enter a new tag"
+                                v-model = "tagText"
+                                prepend-icon = "local_offer"
+                                :rules = "tagTextRules"
+                            >
 
+                            </v-text-field>
+
+                            <v-col class = "text-right">
+                                 <v-btn class ="mb-4"  color = "error" @click="addTag" >Add Tag</v-btn>
+                            </v-col>
+                           <template v-for = "(item,index) in tags">
+                                <v-chip
+                                        :key = "index"
+                                        class="ma-2"
+                                        close
+                                        color="teal"
+                                        text-color="white"
+                                        @click:close="closeTag(item)"
+                                >
+                                    <v-avatar left>
+                                        <v-icon>mdi-checkbox-marked-circle</v-icon>
+                                    </v-avatar>
+                                    {{item.tagName}}
+                                </v-chip>
+                           </template>
 
                             <div class="col text-center">
                                 <v-btn outlined class="indigo mr-2" @click="createStorySubmit" :disabled="!valid3">SUBMIT</v-btn>
@@ -198,6 +244,7 @@
                     v => !!v || "Name is required",
                     v => (v && v.length <= 500) || "Body must be less than 500 characters"
                 ],
+                tagTextRules:[],
                 //rules
                 dialog: false ,
                 dialog2:false,
@@ -213,12 +260,27 @@
                 registerConfirmPassword:"",
                 loginStatus:false,
                 createStoryTitle:"",
-                createStoryBody:""
+                createStoryBody:"",
+                tagText:"",
+                tags:[],
+                tagPresentMap:{},
+                tagSearchText: "",
+                searchedStories: []
+
 
             }
 
         },
+        watch: {
+            'tagText' (val) {
+                this.tagTextRules = [];
+                console.log("called from watcher tagTex " , val);
+            }
+        },
         methods:{
+            testSearch(){
+              console.log('I am called from testSearch');
+            },
             loginSubmit(){
                 this.$refs.form.validate();
 
@@ -259,7 +321,7 @@
                     .then(res=>{
                         this.$swal({
                             icon: "success",
-                            title: "Registerd!",
+                            title: "Registered!",
                             text: `Successfully registered as ${res.data.userName}.`,
                             showConfirmButton: false,
                             timer: 1500
@@ -289,7 +351,8 @@
 
             },
             createStorySubmit(){
-                axios.post(`http://${this.host}:${this.port}/api/stories`,{title:this.createStoryTitle , body:this.createStoryBody},{
+
+                axios.post(`http://${this.host}:${this.port}/api/stories`,{title:this.createStoryTitle , body:this.createStoryBody, tags:this.tags},{
                     headers:{
                         Authorization : JSON.parse(localStorage.getItem("token"))
                     }
@@ -356,15 +419,48 @@
                 });
 
 
+            },
+            homeButtonFunc(){
 
+             localStorage.removeItem("tagSearch");
+             this.$router.go();
+            }
+            ,
+            addTag(){
+
+                this.tagTextRules = [
+                    v=> !!v || "Empty tag cannot be added",
+                    v=> this.tagPresentMap[v] === null || "Tag already present"
+                ]
+                if(this.tagText!=='' && this.tagPresentMap[this.tagText] == null ) {
+                    this.tagPresentMap[this.tagText] = true;
+                    this.tags.push({tagName: this.tagText});
+                }
+                console.log(this.tags);
+            },
+            closeTag(tag){
+                this.tags = this.tags.filter((ob)=>{
+                    return ob!==tag;
+                })
+                delete this.tagPresentMap[tag.tagName];
+            },
+            tagSearchSubmit(){
+
+                this.$emit('tag-search', this.tagSearchText);
 
             }
-
 
         }
     }
 </script>
 
 <style scoped>
+    /*.custom-placeholder-color input::placeholder {*/
+    /*    color: green!important;*/
+    /*    opacity: 1;*/
+    /*}*/
+
+
+
 
 </style>

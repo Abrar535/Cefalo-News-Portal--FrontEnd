@@ -1,17 +1,34 @@
 <template>
 
     <v-content>
-        <Navbar :host = "this.host" :port = "this.port" :user = "this.user" v-on:create-story = "createStory" />
+        <Navbar :host = "this.host" :port = "this.port" :user = "this.user" v-on:create-story = "createStory" v-on:tag-search="tagSearch" />
         <v-container>
+            <div v-if = "tagSearchText!== null">
+                Showing search results of tag <strong><i>{{tagSearchText}}</i></strong> :
+                <div v-if = "stories.length === 0">No story with tag <strong><i>{{tagSearchText}}</i></strong> has been found</div>
+            </div>
 
             <template v-for = "(item,index) in stories">
                 <v-card class = "ma-3" elevation="5" :key="index">
                     <v-card-title>{{item.title}}</v-card-title>
+
                     <v-card-subtitle>
                         By <span class = "font-weight-bold">{{item.user.fullName}}</span> on <span class = "font-weight-bold">{{item.publishedDate}}</span>
 
-
                     </v-card-subtitle>
+                    <template v-for = "(tag,id) in item.tags">
+                        <v-chip
+                                :key = "id"
+                                class="ma-2"
+                                color="teal"
+                                text-color="white"
+                        >
+                            <v-avatar left>
+                                <v-icon>local_offer</v-icon>
+                            </v-avatar>
+                            {{tag.tagName}}
+                        </v-chip>
+                    </template>
                     <v-card-text>{{item.body}}</v-card-text>
                     <div v-if = "user !== null && user.userName === item.user.userName">
 
@@ -110,7 +127,7 @@ export default {
 // pagination data
           totalNumberOfStories:0,
           totalNumberOfPages:0,
-          storiesPerPage:1,
+          storiesPerPage:4,
           circle: false,
           disabled: false,
           nextIcon: 'navigate_next',
@@ -119,6 +136,7 @@ export default {
          // prevIcons: ['mdi-chevron-left', 'mdi-arrow-left', 'mdi-menu-left'],
           page: 1,
           totalVisible: 9,
+          tagSearchText:'b',
 
 //pagination data
           //rules
@@ -129,19 +147,37 @@ export default {
 
       }
     },
-    props:["host","port"],
+    props:["host","port","searchedStories","searchEvent"],
     methods:{
       getPaginatedStory(){
         console.log("Current page is ", this.page);
-          axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=${this.page-1}&pageSize=${this.storiesPerPage}`)
-              .then((res)=>{
-                  this.stories = res.data.stories;
-                  this.totalNumberOfPages = res.data.totalNumberOfPages;
-                  console.log("I am total pages" , this.totalNumberOfPages);
-              })
-              .catch(err=>{
-                  console.log(err);
-              });
+        if(this.tagSearchText!=null ){
+
+            axios.get(`http://${this.host}:${this.port}/api/public/tags/${this.tagSearchText}/story?pageNum=${this.page-1}&pageSize=${this.storiesPerPage}`)
+                .then((res) => {
+
+                    this.stories = res.data.stories ;
+                    this.totalNumberOfPages = res.data.totalNumberOfPages;
+                    console.log(this.stories);
+
+                })
+                .catch(err => {
+                    console.log('An error has occurred while searching by tags');
+                    console.log(err);
+                });
+
+        }
+        else {
+            axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=${this.page - 1}&pageSize=${this.storiesPerPage}`)
+                .then((res) => {
+                    this.stories = res.data.stories;
+                    this.totalNumberOfPages = res.data.totalNumberOfPages;
+                    console.log("I am total pages", this.totalNumberOfPages);
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
       },
 
       createStory(story){
@@ -249,19 +285,51 @@ export default {
               }
             });
 
+        },
+        tagSearch(tagSearchText){
+
+           if(tagSearchText !=="") {
+               localStorage.setItem("tagSearch", tagSearchText);
+           }
+           this.$router.go();
+
         }
 
     },
     created(){
-    axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=0&pageSize=${this.storiesPerPage}`)
-        .then((res)=>{
-            this.stories = res.data.stories;
-            this.totalNumberOfPages = res.data.totalNumberOfPages;
-            console.log("I am total pages" , this.totalNumberOfPages);
-        })
-        .catch(err=>{
-            console.log(err);
-        });
+
+      console.log('Home created called');
+      console.log("called from localStorage ", localStorage.getItem("tagSearch"));
+      this.tagSearchText = localStorage.getItem("tagSearch");
+
+    if(this.tagSearchText!==null){
+
+        axios.get(`http://${this.host}:${this.port}/api/public/tags/${this.tagSearchText}/story?pageNum=0&pageSize=${this.storiesPerPage}`)
+            .then((res) => {
+
+                this.stories = res.data.stories ;
+                this.totalNumberOfPages = res.data.totalNumberOfPages;
+                console.log(this.stories);
+
+            })
+            .catch(err => {
+                console.log('An error has occurred while searching by tags');
+                console.log(err);
+            });
+
+    }
+    else {
+        console.log("blah blah else");
+        axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=0&pageSize=${this.storiesPerPage}`)
+            .then((res) => {
+                this.stories = res.data.stories;
+                this.totalNumberOfPages = res.data.totalNumberOfPages;
+                console.log("I am total pages", this.totalNumberOfPages);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
 
     axios.get(`http://${this.host}:${this.port}/api/users/user`,{
         headers:{
@@ -277,6 +345,10 @@ export default {
             console.log(err,'Custom Error');
             localStorage.removeItem("token");
         });
+    console.log(this.searchEvent);
+
+
+
 
     }
 

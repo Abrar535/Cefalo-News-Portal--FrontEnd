@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import TagSearch from '../views/TagSearch.vue'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
@@ -14,6 +15,11 @@ Vue.use(VueSweetalert2);
     name: 'Home',
     component: Home
   },
+    {
+      path: '/tagsearch/:tagName',
+      name: 'tagSearch',
+      component: TagSearch
+    },
 
 
 ]
