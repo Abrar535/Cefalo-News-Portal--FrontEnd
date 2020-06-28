@@ -9,6 +9,7 @@
             </div>
 
             <template v-for = "(item,index) in stories">
+                {{showComments[0]}}
                 <v-card class = "ma-3" elevation="5" :key="index">
                     <v-card-title>{{item.title}}</v-card-title>
 
@@ -30,49 +31,76 @@
                         </v-chip>
                     </template>
                     <v-card-text>{{item.body}}</v-card-text>
-                    <div v-if = "user !== null && user.userName === item.user.userName">
 
-                    <v-btn @click.stop = "dialog=true" @click="editStoryTitle = item.title, editStoryBody = item.body , editStoryDate = item.publishedDate , editStory(item.storyId)"  class = "mx-3 mb-1" ><v-icon>create</v-icon>Edit</v-btn>
-                    <v-btn class = "mx-2 mb-1" @click = "deleteStory(item.storyId)"><v-icon>delete</v-icon>Delete</v-btn>
-                    </div>
+                    <v-row>
+                        <v-col>
+                            <v-btn class = "mx-3 mb-1" @click = "getAllCommentsByStoryId()">Comments</v-btn>
+                            <span v-if = "user !== null && user.userName === item.user.userName">
+
+<!--                                <v-btn  @click="dialog = true , editStoryTitle = item.title, editStoryBody = item.body , editStoryDate = item.publishedDate , editStory(item.storyId)"  class = "mx-2 mb-1" ><v-icon>create</v-icon>Edit</v-btn>-->
+
+
+                                 <v-btn class = "mx-2 mb-1" @click = "deleteStory(item.storyId)"><v-icon>delete</v-icon>Delete</v-btn>
+
+                             </span>
+
+                        </v-col>
+
+                    </v-row>
+
+<!--                    <div v-if = "showComments[index] === false">-->
+<!--                        <h1>hello</h1>-->
+<!--                        {{item.storyId}}-->
+<!--                        <template v-for = "(comment, commentId) in storyCommentsMap[item.storyId] ">-->
+
+<!--                            <v-card  class = "ma-3" elevation="5" :key="commentId">-->
+<!--                                <v-card-title>{{comment.userName}}</v-card-title>-->
+<!--                                <v-card-text>{{comment.text}}</v-card-text>-->
+<!--                            </v-card>-->
+
+
+<!--                        </template>-->
+<!--                    </div>-->
+
+
                 </v-card>
             </template>
 <!--            Edit a story-->
-            <v-dialog v-model ="dialog" width = "500">
+<!--            <v-dialog v-model ="dialog" width = "500">-->
 
-                <v-card class="elevation-12" >
-                    <v-app-bar dark class="primary darken-3">
-                        <v-toolbar-title>Edit Story</v-toolbar-title>
-                    </v-app-bar>
-                    <v-form ref="form" class="px-3 my-3" v-model="valid">
-                        <v-text-field
-                                label="Title"
-                                placeholder="Enter the title of your story"
-                                v-model="editStoryTitle"
-                                prepend-icon="create"
-                                :rules="[v => !!v || 'FullName is required']"
-                        ></v-text-field>
+<!--                <v-card class="elevation-12" >-->
+<!--                    <v-app-bar dark class="primary darken-3">-->
+<!--                        <v-toolbar-title>Edit Story</v-toolbar-title>-->
+<!--                    </v-app-bar>-->
+<!--                    <v-form ref="form" class="px-3 my-3" v-model="valid">-->
+<!--                        <v-text-field-->
+<!--                                label="Title"-->
+<!--                                placeholder="Enter the title of your story"-->
+<!--                                v-model="editStoryTitle"-->
+<!--                                prepend-icon="create"-->
+<!--                                :rules="[v => !!v || 'FullName is required']"-->
+<!--                        ></v-text-field>-->
 
-                        <v-textarea
+<!--                        <v-textarea-->
 
-                                filled
-                                label="Body"
-                                placeholder="Enter the body of your story"
-                                v-model="editStoryBody"
-                                :counter="500"
-                                prepend-icon="create"
-                                :rules="editStoryRules"
-                        ></v-textarea>
+<!--                                filled-->
+<!--                                label="Body"-->
+<!--                                placeholder="Enter the body of your story"-->
+<!--                                v-model="editStoryBody"-->
+<!--                                :counter="500"-->
+<!--                                prepend-icon="create"-->
+<!--                                :rules="editStoryRules"-->
+<!--                        ></v-textarea>-->
 
 
-                        <div class="col text-center">
-                            <v-btn outlined class="indigo mr-2" @click="editStorySubmit" :disabled="!valid">SUBMIT</v-btn>
-                            <v-btn color="error darken-2" class="mr-4" @click="editStoryReset">CLEAR</v-btn>
-                        </div>
-                    </v-form>
-                </v-card>
+<!--                        <div class="col text-center">-->
+<!--                            <v-btn outlined class="indigo mr-2" @click="editStorySubmit" :disabled="!valid">SUBMIT</v-btn>-->
+<!--                            <v-btn color="error darken-2" class="mr-4" @click="editStoryReset">CLEAR</v-btn>-->
+<!--                        </div>-->
+<!--                    </v-form>-->
+<!--                </v-card>-->
 
-            </v-dialog>
+<!--            </v-dialog>-->
 
         </v-container>
 
@@ -139,11 +167,23 @@ export default {
           tagSearchText:'b',
 
 //pagination data
+
+          //comments data
+          storyCommentsMap: {},
+          showComments:[],
+          testVal:"hello",
+
+
+
+          //comments data
+
+
           //rules
           editStoryRules: [
               v => !!v || "Name is required",
               v => (v && v.length <= 500) || "Body must be less than 500 characters"
           ]
+          //rules
 
       }
     },
@@ -293,6 +333,31 @@ export default {
            }
            this.$router.go();
 
+        },
+        getAllCommentsByStoryId(){
+            this.showComments[0] = true;
+            this.testVal = "hello world";
+             console.log(this.showComments[0]);
+          //   console.log(this.showComments, ' ', this.storyId, ' ' , index);
+          // if(this.storyCommentsMap[storyId] !==null) {
+          //     if(this.showComments[index]){
+          //         console.log("got inside showComments");
+          //
+          //         axios.get(`http://localhost:8080/api/public/stories/${storyId}/comments`)
+          //         .then(res=>{
+          //
+          //             this.storyCommentsMap[storyId] = res.data;
+          //             console.log(this.storyCommentsMap[storyId]);
+          //
+          //         })
+          //         .catch(err=>{
+          //
+          //             console.log(err);
+          //         })
+          //
+          //     }
+          // }
+
         }
 
     },
@@ -309,6 +374,8 @@ export default {
 
                 this.stories = res.data.stories ;
                 this.totalNumberOfPages = res.data.totalNumberOfPages;
+                this.showComments = new Array(this.stories.length).fill(false);
+
                 console.log(this.stories);
 
             })
@@ -319,11 +386,12 @@ export default {
 
     }
     else {
-        console.log("blah blah else");
+
         axios.get(`http://${this.host}:${this.port}/api/public/stories?pageNum=0&pageSize=${this.storiesPerPage}`)
             .then((res) => {
                 this.stories = res.data.stories;
                 this.totalNumberOfPages = res.data.totalNumberOfPages;
+                this.showComments = new Array(this.stories.length).fill(false);
                 console.log("I am total pages", this.totalNumberOfPages);
             })
             .catch(err => {
