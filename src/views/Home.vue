@@ -9,7 +9,7 @@
             </div>
 
             <template v-for = "(item,index) in stories">
-                {{showComments[0]}}
+
                 <v-card class = "ma-3" elevation="5" :key="index">
                     <v-card-title>{{item.title}}</v-card-title>
 
@@ -34,10 +34,11 @@
 
                     <v-row>
                         <v-col>
-                            <v-btn class = "mx-3 mb-1" @click = "getAllCommentsByStoryId()">Comments</v-btn>
+                            <v-btn class = "mx-3 mb-1" @click.stop="commentDialog = true, storyId = item.storyId" @click = "createCommentReset"> Add Comment</v-btn>
+                            <v-btn class = "mx-2 mb-1" @click = "getAllCommentsByStoryId(item.storyId,index)">Show All Comments</v-btn>
                             <span v-if = "user !== null && user.userName === item.user.userName">
 
-<!--                                <v-btn  @click="dialog = true , editStoryTitle = item.title, editStoryBody = item.body , editStoryDate = item.publishedDate , editStory(item.storyId)"  class = "mx-2 mb-1" ><v-icon>create</v-icon>Edit</v-btn>-->
+                                <v-btn  @click.stop="dialog = true" @click ="editStoryTitle = item.title, editStoryBody = item.body , editStoryDate = item.publishedDate , editStory(item.storyId)"  class = "mx-2 mb-1" ><v-icon>create</v-icon>Edit</v-btn>
 
 
                                  <v-btn class = "mx-2 mb-1" @click = "deleteStory(item.storyId)"><v-icon>delete</v-icon>Delete</v-btn>
@@ -48,60 +49,95 @@
 
                     </v-row>
 
-<!--                    <div v-if = "showComments[index] === false">-->
-<!--                        <h1>hello</h1>-->
-<!--                        {{item.storyId}}-->
-<!--                        <template v-for = "(comment, commentId) in storyCommentsMap[item.storyId] ">-->
+                    <div v-if = "showComments[index] === true">
 
-<!--                            <v-card  class = "ma-3" elevation="5" :key="commentId">-->
-<!--                                <v-card-title>{{comment.userName}}</v-card-title>-->
-<!--                                <v-card-text>{{comment.text}}</v-card-text>-->
-<!--                            </v-card>-->
+                        <template v-for = "(comment, commentId) in storyCommentsMap[item.storyId] ">
+
+                            <v-card  class = "ma-3" elevation="5" :key="commentId">
+                                <v-card-title>{{comment.userName}}</v-card-title>
+                                <v-card-text>{{comment.text}}</v-card-text>
+                            </v-card>
 
 
-<!--                        </template>-->
-<!--                    </div>-->
+                        </template>
+                    </div>
 
 
                 </v-card>
             </template>
 <!--            Edit a story-->
-<!--            <v-dialog v-model ="dialog" width = "500">-->
+            <v-dialog v-model ="dialog" width = "500">
 
-<!--                <v-card class="elevation-12" >-->
-<!--                    <v-app-bar dark class="primary darken-3">-->
-<!--                        <v-toolbar-title>Edit Story</v-toolbar-title>-->
-<!--                    </v-app-bar>-->
-<!--                    <v-form ref="form" class="px-3 my-3" v-model="valid">-->
-<!--                        <v-text-field-->
-<!--                                label="Title"-->
-<!--                                placeholder="Enter the title of your story"-->
-<!--                                v-model="editStoryTitle"-->
-<!--                                prepend-icon="create"-->
-<!--                                :rules="[v => !!v || 'FullName is required']"-->
-<!--                        ></v-text-field>-->
+                <v-card class="elevation-12" >
+                    <v-app-bar dark class="primary darken-3">
+                        <v-toolbar-title>Edit Story</v-toolbar-title>
+                    </v-app-bar>
+                    <v-form ref="form" class="px-3 my-3" v-model="valid">
+                        <v-text-field
+                                label="Title"
+                                placeholder="Enter the title of your story"
+                                v-model="editStoryTitle"
+                                prepend-icon="create"
+                                :rules="[v => !!v || 'FullName is required']"
+                        ></v-text-field>
 
-<!--                        <v-textarea-->
+                        <v-textarea
 
-<!--                                filled-->
-<!--                                label="Body"-->
-<!--                                placeholder="Enter the body of your story"-->
-<!--                                v-model="editStoryBody"-->
-<!--                                :counter="500"-->
-<!--                                prepend-icon="create"-->
-<!--                                :rules="editStoryRules"-->
-<!--                        ></v-textarea>-->
+                                filled
+                                label="Body"
+                                placeholder="Enter the body of your story"
+                                v-model="editStoryBody"
+                                :counter="500"
+                                prepend-icon="create"
+                                :rules="editStoryRules"
+                        ></v-textarea>
 
 
-<!--                        <div class="col text-center">-->
-<!--                            <v-btn outlined class="indigo mr-2" @click="editStorySubmit" :disabled="!valid">SUBMIT</v-btn>-->
-<!--                            <v-btn color="error darken-2" class="mr-4" @click="editStoryReset">CLEAR</v-btn>-->
-<!--                        </div>-->
-<!--                    </v-form>-->
-<!--                </v-card>-->
+                        <div class="col text-center">
+                            <v-btn outlined class="indigo mr-2" @click="editStorySubmit" :disabled="!valid">SUBMIT</v-btn>
+                            <v-btn color="error darken-2" class="mr-4" @click="editStoryReset">CLEAR</v-btn>
+                        </div>
+                    </v-form>
+                </v-card>
 
-<!--            </v-dialog>-->
+            </v-dialog>
 
+<!--            Create a comment-->
+            <v-dialog v-model ="commentDialog" width = "500">
+
+                <v-card class="elevation-12" >
+                    <v-app-bar dark class="primary darken-3">
+                        <v-toolbar-title>Add Comment</v-toolbar-title>
+                    </v-app-bar>
+                    <v-form ref="form2" class="px-3 my-3" v-model="valid2">
+                        <v-text-field
+                                label="Username"
+                                placeholder="Enter your username"
+                                v-model="createCommentUserName"
+                                prepend-icon="create"
+                                :rules="[v => !!v || 'Username is required']"
+                        ></v-text-field>
+
+                        <v-textarea
+
+                                filled
+                                label="Comment"
+                                placeholder="Enter your comment"
+                                v-model="createCommentText"
+                                :counter="500"
+                                prepend-icon="create"
+                                :rules="editStoryRules"
+                        ></v-textarea>
+
+
+                        <div class="col text-center">
+                            <v-btn outlined class="indigo mr-2" @click="createCommentSubmit" :disabled="!valid2">SUBMIT</v-btn>
+                            <v-btn color="error darken-2" class="mr-4" @click="createCommentReset">CLEAR</v-btn>
+                        </div>
+                    </v-form>
+                </v-card>
+
+            </v-dialog>
         </v-container>
 
         <v-container>
@@ -164,15 +200,17 @@ export default {
          // prevIcons: ['mdi-chevron-left', 'mdi-arrow-left', 'mdi-menu-left'],
           page: 1,
           totalVisible: 9,
-          tagSearchText:'b',
+          tagSearchText:'',
 
 //pagination data
 
           //comments data
           storyCommentsMap: {},
           showComments:[],
-          testVal:"hello",
-
+          commentDialog:false,
+          createCommentUserName: '',
+          createCommentText:'',
+          valid2:"",
 
 
           //comments data
@@ -184,6 +222,8 @@ export default {
               v => (v && v.length <= 500) || "Body must be less than 500 characters"
           ]
           //rules
+
+
 
       }
     },
@@ -334,31 +374,54 @@ export default {
            this.$router.go();
 
         },
-        getAllCommentsByStoryId(){
-            this.showComments[0] = true;
-            this.testVal = "hello world";
-             console.log(this.showComments[0]);
-          //   console.log(this.showComments, ' ', this.storyId, ' ' , index);
-          // if(this.storyCommentsMap[storyId] !==null) {
-          //     if(this.showComments[index]){
-          //         console.log("got inside showComments");
-          //
-          //         axios.get(`http://localhost:8080/api/public/stories/${storyId}/comments`)
-          //         .then(res=>{
-          //
-          //             this.storyCommentsMap[storyId] = res.data;
-          //             console.log(this.storyCommentsMap[storyId]);
-          //
-          //         })
-          //         .catch(err=>{
-          //
-          //             console.log(err);
-          //         })
-          //
-          //     }
-          // }
+        getAllCommentsByStoryId(storyId,index){
+          this.createCommentReset();
+          console.log(storyId,' ',index);
+          this.$set(this.showComments, index, !this.showComments[index]);
+          console.log(this.showComments, ' ', storyId, ' ' , index);
+          if(this.storyCommentsMap[storyId] !==null) {
+              if(this.showComments[index]){
+                  console.log("got inside showComments");
 
+                  axios.get(`http://localhost:8080/api/public/stories/${storyId}/comments`)
+                  .then(res=>{
+                      //this.storyCommentsMap[storyId] = res.data;
+
+                      this.$set(this.storyCommentsMap,storyId,res.data);
+                      console.log(this.storyCommentsMap[storyId]);
+
+                  })
+                  .catch(err=>{
+
+                      console.log(err);
+                  })
+
+              }
+          }
+
+        },
+
+        createCommentSubmit(){
+          console.log(this.storyId);
+          this.commentDialog = false ;
+          axios.post(`http://localhost:8080/api/public/stories/${this.storyId}/comments`, {userName: this.createCommentUserName , text : this.createCommentText})
+            .then(res=>{
+               this.storyCommentsMap[this.storyId].push(res.data);
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+
+
+        },
+        createCommentReset(){
+            if(this.$refs.form2!==undefined) {
+                this.$refs.form2.reset();
+            }
         }
+
+
+
 
     },
     created(){
