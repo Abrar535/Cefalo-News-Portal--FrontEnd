@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import TagSearch from '../views/TagSearch.vue'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import TrendingTags from "@/views/TrendingTags";
 
 Vue.use(VueRouter)
 Vue.use(VueSweetalert2);
@@ -16,9 +16,9 @@ Vue.use(VueSweetalert2);
     component: Home
   },
     {
-      path: '/tagsearch/:tagName',
-      name: 'tagSearch',
-      component: TagSearch
+      path: '/trendingTags',
+      name: 'TrendingTags',
+      component: TrendingTags
     },
 
 

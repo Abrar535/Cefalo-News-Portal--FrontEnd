@@ -6,7 +6,13 @@
                 <span class = "font-weight-black mx-3 display-2"> Cefalo News Portal </span>
             </v-toolbar-title>
             </v-btn>
+            <v-btn  class="success darken-1 my-1 mx-1" width="130" @click="trendingTags">
+
+                <span class="font-weight-light white--text">Trending Tags</span>
+
+            </v-btn>
             <v-spacer></v-spacer>
+
 <!-- Tag Searching-->
             <v-form @submit.prevent="tagSearchSubmit">
                 <div class = "mt-8 pa-3">
@@ -412,7 +418,12 @@
                             timer: 1500
                         });
                         setTimeout(() => {
-                            this.$router.go();
+                            if(this.$route.name === 'Home') {
+                                this.$router.go();
+                            }
+                            else{
+                                this.$router.push("/")
+                            }
                         }, 1501);
 
                     }
@@ -423,7 +434,12 @@
             homeButtonFunc(){
 
              localStorage.removeItem("tagSearch");
-             this.$router.go();
+             if(this.$route.name === "Home") {
+                 this.$router.go();
+             }
+             else {
+                 this.$router.push("/");
+             }
             }
             ,
             addTag(){
@@ -448,7 +464,20 @@
 
                 this.$emit('tag-search', this.tagSearchText);
 
+            },
+            trendingTags(){
+                if(this.$route.name === "TrendingTags"){
+                    this.$router.go();
+                }
+                else {
+                    this.$router.push("/trendingTags");
+                }
             }
+
+        },
+        created(){
+            console.log(localStorage.getItem("token"));
+
 
         }
     }
